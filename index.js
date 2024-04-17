@@ -2,13 +2,16 @@ const express = require("express");
 const dotenv = require("dotenv");
 const path = require('path');
 const { default: mongoose } = require("mongoose");
-const app = express();
+const { createServer } = require('node:http');
+const { Server } = require("socket.io");
 const cors = require("cors");
 const userRoutes = require("./Routes/userRoutes");
 const chatRoutes = require("./Routes/chatRoutes");
 const messageRoutes = require("./Routes/messageRoutes");
 const { createChatbotUser } = require("./Controllers/userController");
 
+const app = express();
+const server = createServer(app);
 
 app.use(
 	cors({
@@ -25,7 +28,8 @@ app.use(express.static(pathTemp));
 
 const connectDb = async () => {
 	try {
-		const connect = await mongoose.connect(process.env.MONGO_URI);
+		const dbURI = "mongodb+srv://shaker889990:mongodb_5.5password@globaltalkchatapp.vxzpwkj.mongodb.net/?retryWrites=true&w=majority&appName=globalTalkChatApp";
+		const connect = await mongoose.connect(dbURI);
 		console.log("connected to Database");
 		createChatbotUser()
 	} catch (err) {
@@ -42,12 +46,10 @@ app.use("/user", userRoutes);
 app.use("/chat", chatRoutes);
 app.use("/message", messageRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, console.log(`Server is Running, ${PORT} ...`));
 
-const { Server } = require("socket.io");
 const WEB_SOCKET_PORT = process.env.WEB_SOCKET_PORT || 6000;
-const io = new Server(WEB_SOCKET_PORT, {
+// const io = new Server(WEB_SOCKET_PORT, {
+const io = new Server(server, {
 	cors: {
 		origin: "*",
 	},
@@ -56,7 +58,7 @@ const io = new Server(WEB_SOCKET_PORT, {
 
 let ROOM_ID;
 io.on("connection", (socket) => {
-
+	console.log('a user connected');
 	socket.on("setup", (user) => {
 		socket.join(user.data._id);
 		socket.emit("connected");
@@ -104,3 +106,9 @@ io.on("connection", (socket) => {
 		socket.to(ROOM_ID).emit("screen:received")
 	})
 })
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+	console.log(`Server is Running, ${PORT} ...`)
+});
+
