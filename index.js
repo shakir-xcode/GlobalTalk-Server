@@ -28,8 +28,7 @@ app.use(express.static(pathTemp));
 
 const connectDb = async () => {
 	try {
-		const dbURI = "mongodb+srv://shaker889990:mongodb_5.5password@globaltalkchatapp.vxzpwkj.mongodb.net/?retryWrites=true&w=majority&appName=globalTalkChatApp";
-		const connect = await mongoose.connect(dbURI);
+		const connect = await mongoose.connect(process.env.MONGO_URI);
 		console.log("connected to Database");
 		createChatbotUser()
 	} catch (err) {
@@ -46,9 +45,6 @@ app.use("/user", userRoutes);
 app.use("/chat", chatRoutes);
 app.use("/message", messageRoutes);
 
-
-const WEB_SOCKET_PORT = process.env.WEB_SOCKET_PORT || 6000;
-// const io = new Server(WEB_SOCKET_PORT, {
 const io = new Server(server, {
 	cors: {
 		origin: "*",
@@ -58,7 +54,6 @@ const io = new Server(server, {
 
 let ROOM_ID;
 io.on("connection", (socket) => {
-	console.log('a user connected');
 	socket.on("setup", (user) => {
 		socket.join(user.data._id);
 		socket.emit("connected");
@@ -107,7 +102,7 @@ io.on("connection", (socket) => {
 	})
 })
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.MONGO_URI.PORT || 5000;
 server.listen(PORT, () => {
 	console.log(`Server is Running, ${PORT} ...`)
 });

@@ -7,8 +7,6 @@ const { G4F } = require("g4f");
 
 const sendBotMessage = expressAsyncHandler(async (req, res) => {
     const { content, chatId, } = req.body;
-    console.log(chatId)
-
     const botID = new mongoose.Types.ObjectId(process.env.BOT_ID);
 
     if (!content || !chatId) {
@@ -45,12 +43,10 @@ const sendBotMessage = expressAsyncHandler(async (req, res) => {
 
 const gptCallController = async (req, res) => {
     const g4f = new G4F();
-    // console.log('QUERY is = ', req.body.query)
     const messages = [
         { role: "user", content: req.body.query }
     ];
     g4f.chatCompletion(messages).then(data => {
-        console.log(data)
         res.status(200).json({ message: data })
     })
         .catch(err => {
