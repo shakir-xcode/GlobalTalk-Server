@@ -60,45 +60,48 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("join chat", (room) => {
+		if (ROOM_ID) {
+			socket.leave(ROOM_ID)
+		}
 		ROOM_ID = room;
 		socket.join(room);
 	});
 
 	socket.on("new message", (newMessageStatus) => {
 		let chat = newMessageStatus.chat;
-		if (!chat.users) return console.log("chat.users not defined");
-
-		chat.users.forEach(user => {
-			if (!(user._id === newMessageStatus.sender._id)) {
-				socket.in(user._id).emit("message received", newMessageStatus);
-			}
-		})
+		if (!chat.users) return
+		socket.to(ROOM_ID).emit("message received", newMessageStatus);
+		// chat.users.forEach(user => {
+		// 	if (!(user._id === newMessageStatus.sender._id)) {
+		// 		socket.in(user._id).emit("message received", newMessageStatus);
+		// 	}
+		// })
 	})
 
 	// -------------- For webRTC -----------------
-	socket.on("user:call", ({ offer, CALL_TYPE }) => {
-		socket.to(ROOM_ID).emit("incomming:call", { offer, callType: CALL_TYPE });
-
+	socket.on("user:call", ({ offer, CALL_TYPE, userId, senderId, callername }) => {
+		socket.to(userId).emit("incomming:call", { offer, callType: CALL_TYPE, userId, senderId, callername });
 	});
 
-	socket.on("call:accepted", ({ ans }) => {
-		socket.to(ROOM_ID).emit("call:accepted", { ans });
+	socket.on("call:accepted", ({ ans, userId }) => {
+		socket.to(userId).emit("call:accepted", { ans });
 	});
 
-	socket.on("peer:nego:needed", ({ offer }) => {
-		socket.to(ROOM_ID).emit("peer:nego:needed", { offer });
+	socket.on("peer:nego:needed", ({ offer, userId }) => {
+		socket.to(userId).emit("peer:nego:needed", { offer });
+
 	});
 
 	socket.on("peer:nego:done", ({ ans }) => {
 		socket.to(ROOM_ID).emit("peer:nego:final", { ans });
 	});
 
-	socket.on("end:call", () => {
-		socket.to(ROOM_ID).emit("end:call")
+	socket.on("end:call", ({ userId }) => {
+		socket.to(userId).emit("end:call");
 	})
 
-	socket.on("screen:received", () => {
-		socket.to(ROOM_ID).emit("screen:received")
+	socket.on("screen:received", ({ userId }) => {
+		socket.to(userId).emit("screen:received")
 	})
 })
 
