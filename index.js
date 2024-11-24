@@ -13,11 +13,14 @@ const { createChatbotUser } = require("./Controllers/userController");
 const app = express();
 const server = createServer(app);
 
-app.use(
-	cors({
-		origin: "*",
-	})
-);
+const allowedOrigin = 'https://global-talk.netlify.app';
+app.use(cors({
+  origin: allowedOrigin,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']  // Adjust allowed headers as needed
+}));
+
+
 dotenv.config();
 
 app.use(express.json());
