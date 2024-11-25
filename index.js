@@ -13,7 +13,8 @@ const { createChatbotUser } = require("./Controllers/userController");
 const app = express();
 const server = createServer(app);
 
-const allowedOrigin = 'https://global-talk.netlify.app';
+//const allowedOrigin = 'https://global-talk.netlify.app';
+const allowedOrigin = ["https://global-talk.netlify.app","https://global-talk-client.vercel.app/"];
 app.use(cors({
   origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
