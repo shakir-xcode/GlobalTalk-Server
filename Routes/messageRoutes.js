@@ -7,7 +7,7 @@ const {
   mediaMessage,
 } = require("../Controllers/messageControllers");
 const { sendBotMessage } = require('../Controllers/botMessageController');
-const { gptCallController } = require('../Controllers/botMessageController');
+const { chatbotQueryController } = require('../Controllers/botMessageController');
 const { protect } = require("../middleware/authMiddleware");
 const { downloadController } = require("../middleware/downloader");
 const { translationGuy } = require("../middleware/translationMiddleware");
@@ -20,7 +20,7 @@ router.route("/botMessage").post(sendBotMessage);
 router.route("/").post(protect, translationGuy, sendMessage);
 router.route("/uploads").post(protect, upload.single('file'), mediaMessage);
 router.route("/download/:filename").get(downloadController);
-router.route("/gptCall").post(gptCallController);
+router.route("/gptCall").post(chatbotQueryController);
 
 
 module.exports = router;

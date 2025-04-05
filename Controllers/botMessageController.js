@@ -55,4 +55,41 @@ const gptCallController = async (req, res) => {
 
 }
 
-module.exports = { sendBotMessage, gptCallController };
+
+
+const chatbotQueryController = async (req, res) => {
+const API_KEY = process.env.GEMINI_API_KEY;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+	
+	const query = 'provide the response to the query in not more than 100 words: '+req.body.query;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: query
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const msgData = result.candidates[0].content.parts[0].text;
+	console.log(msgData)
+	res.status(200).json({ message: msgData })
+  } catch (error) {
+	console.log(error.message)
+	res.status(400).json({ message: error })
+  }
+}
+
+
+module.exports = { sendBotMessage, chatbotQueryController };

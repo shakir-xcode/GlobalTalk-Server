@@ -14,7 +14,7 @@ const app = express();
 const server = createServer(app);
 
 //const allowedOrigin = 'https://global-talk.netlify.app';
-const allowedOrigin = ["https://global-talk.netlify.app","https://global-talk-client.vercel.app/"];
+const allowedOrigin = ["http://127.0.0.1:3000","https://global-talk.netlify.app","https://global-talk-client.vercel.app/"];
 app.use(cors({
   origin: allowedOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
